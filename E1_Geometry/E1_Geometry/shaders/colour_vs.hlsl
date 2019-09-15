@@ -24,7 +24,10 @@ struct OutputType
 OutputType main(InputType input)
 {
 	OutputType output;
+
+	//float4 vert
 	
+	input.position *= 1;
 	// Change the position vector to be 4 units for proper matrix calculations.
 	input.position.w = 1.0f;
 
@@ -33,7 +36,7 @@ OutputType main(InputType input)
 	output.position = mul(output.position, viewMatrix);
 	output.position = mul(output.position, projectionMatrix);
 
-	output.colour = input.colour;
+	
 
 	return output;
 }

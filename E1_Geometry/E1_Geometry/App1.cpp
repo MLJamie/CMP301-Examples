@@ -14,7 +14,7 @@ void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeigh
 	BaseApplication::init(hinstance, hwnd, screenWidth, screenHeight, in, VSYNC, FULL_SCREEN);
 
 	// Create Mesh object
-	mesh = new TriangleMesh(renderer->getDevice(), renderer->getDeviceContext());
+	//mesh = new TriangleMesh(renderer->getDevice(), renderer->getDeviceContext());
 	mesh2 = new ColourTriangle(renderer->getDevice(), renderer->getDeviceContext());
 
 	colourShader = new ColourShader(renderer->getDevice(), hwnd);
