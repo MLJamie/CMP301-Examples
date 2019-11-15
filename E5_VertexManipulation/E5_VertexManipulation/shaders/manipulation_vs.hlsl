@@ -1,11 +1,20 @@
 // Light vertex shader
 // Standard issue vertex shader, apply matrices, pass info to pixel shader
+
+
 cbuffer MatrixBuffer : register(b0)
 {
 	matrix worldMatrix;
 	matrix viewMatrix;
 	matrix projectionMatrix;
 };
+cbuffer TimeBuffer : register(b1)
+{
+	float time;
+	float amplitude;
+	float frequency;
+	float speed;
+}
 
 struct InputType
 {
@@ -24,6 +33,14 @@ struct OutputType
 OutputType main(InputType input)
 {
 	OutputType output;
+	float spd = time * speed;
+	//offset position based off sine wave
+	input.position.y = (amplitude * sin((input.position.x * frequency) + (spd))) + (amplitude * cos((input.position.z * frequency) + (spd)));
+
+
+	//normals
+	input.normal.x = 1 - (amplitude * sin((input.position.x * frequency) + (spd))) + (amplitude * sin((input.position.z * frequency) + (spd)));
+	input.normal.y = abs(cos(input.position.x + spd));
 
 	// Calculate the position of the vertex against the world, view, and projection matrices.
 	output.position = mul(input.position, worldMatrix);

@@ -5,6 +5,7 @@
 // Includes
 #include "DXF.h"	// include dxframework
 #include "ManipulationShader.h"
+#include "MountainShader.h"
 
 
 class App1 : public BaseApplication
@@ -22,9 +23,14 @@ protected:
 	void gui();
 
 private:
-	ManipulationShader* shader;
-	PlaneMesh* mesh;
+	ManipulationShader* waterShader;
+	MountainShader* mountainShader;
+	PlaneMesh* waves;
+	PlaneMesh* mountain;
 	Light* light;
+	float amplitude;
+	float frequency;
+	float speed;
 };
 
 #endif

@@ -27,7 +27,7 @@ OutputType main(InputType input)
 
 	//float4 vert
 	
-	input.position *= 1;
+	input.position *= 2;
 	// Change the position vector to be 4 units for proper matrix calculations.
 	input.position.w = 1.0f;
 
