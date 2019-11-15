@@ -39,8 +39,45 @@ OutputType main(InputType input)
 
 
 	//normals
-	input.normal.x = 1 - (amplitude * sin((input.position.x * frequency) + (spd))) + (amplitude * sin((input.position.z * frequency) + (spd)));
-	input.normal.y = abs(cos(input.position.x + spd));
+	float3 pointNorth, pointEast, pointSouth, pointWest, vectorNorth, vectorEast, vectorSouth, vectorWest, normalSW, normalSE, normalNE, normalNW, finalNormal;
+
+
+	//fix the normals
+
+	pointNorth.x = input.position.x;
+	pointNorth.z = input.position.z + 1;
+	pointNorth.y = amplitude * sin((pointNorth.x * frequency) + time * speed) + amplitude * cos((pointNorth.z * frequency) + time * speed);
+	
+	pointEast.x = input.position.x + 1;
+	pointEast.z = input.position.z;
+	pointEast.y = amplitude * sin((pointEast.x * frequency) + time * speed) + amplitude * cos((pointEast.z * frequency) + time * speed);
+
+	pointSouth.x = input.position.x;
+	pointSouth.z = input.position.z - 1;
+	pointSouth.y = amplitude * sin((pointSouth.x * frequency) + time * speed) + amplitude * cos((pointSouth.z * frequency) + time * speed);
+
+	pointWest.x = input.position.x - 1;
+	pointWest.z = input.position.z;
+	pointWest.y = amplitude * sin((pointWest.x * frequency) + time * speed) + amplitude * cos((pointWest.z * frequency) + time * speed);
+
+	vectorNorth = normalize(pointNorth - input.position);
+	vectorEast = normalize(pointEast - input.position);
+	vectorSouth = normalize(pointSouth - input.position);
+	vectorWest = normalize(pointWest - input.position);
+	
+	
+	normalNE = cross(vectorNorth, vectorEast);
+	normalNW = cross(vectorNorth, vectorWest);
+	normalSW = cross(vectorSouth, vectorWest);
+	normalSE = cross(vectorEast, vectorSouth);
+	
+
+	finalNormal = (normalSW + normalSE + normalNW + normalNE) / 4;
+
+	input.normal.x = finalNormal.x;
+	input.normal.y = finalNormal.y;
+	input.normal.z = finalNormal.z;
+
 
 	// Calculate the position of the vertex against the world, view, and projection matrices.
 	output.position = mul(input.position, worldMatrix);
