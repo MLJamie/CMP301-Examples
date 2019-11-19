@@ -70,7 +70,7 @@ float3 Sobel(float2 tc)
 	float gX = h00 - h20 + 2.0f * h01 - 2.0f * h21 + h02 - h22;
 	float gY = h00 + 2.0f * h10 + h20 - h02 - 2.0f * h12 - h22;
 
-	float gZ = 0.01f * sqrt(max(0.0f, 1.0f - gX * gX - gY * gY));
+	float gZ = 0.001f * sqrt(max(0.0f, 1.0f - gX * gX - gY * gY));
 
 	return normalize(float3(2.0f * gX, gZ, 2.0f * gY));
 }
@@ -83,7 +83,7 @@ OutputType main(InputType input)
 
 
 	float colors = texture0.SampleLevel(sampler0, input.tex, 0.0f);
-	input.position.y = colors * 50;
+	input.position.y = colors * 500;
 
 	input.position.w = 1.0f;
 

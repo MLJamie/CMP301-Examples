@@ -19,7 +19,7 @@ void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeigh
 
 	// Create Mesh object and shader object
 	waves = new PlaneMesh(renderer->getDevice(), renderer->getDeviceContext());
-	mountain = new PlaneMesh(renderer->getDevice(), renderer->getDeviceContext());
+	mountain = new PlaneMesh(renderer->getDevice(), renderer->getDeviceContext(), 1000);
 	waterShader = new ManipulationShader(renderer->getDevice(), hwnd);
 	mountainShader = new MountainShader(renderer->getDevice(), hwnd);
 	light = new Light;
@@ -109,9 +109,9 @@ bool App1::render()
 	waterShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"water"), light, timer->getTime(), amplitude, speed, frequency);
 	waterShader->render(renderer->getDeviceContext(), waves->getIndexCount());
 
+	scale = XMMatrixScaling(0.05f, 0.05f, 0.05f);
 	translate = XMMatrixTranslation(25.0f, -5.0f, 25.0f);
-	scale = XMMatrixScaling(0.5f, 0.5f, 0.5f);
-	worldMatrix = XMMatrixMultiply(translate, scale);
+	worldMatrix = XMMatrixMultiply(scale, translate);
 	mountain->sendData(renderer->getDeviceContext());
 	mountainShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"mountain"), light);
 	mountainShader->render(renderer->getDeviceContext(), mountain->getIndexCount());
