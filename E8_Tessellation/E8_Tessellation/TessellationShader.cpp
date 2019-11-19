@@ -46,8 +46,16 @@ void TessellationShader::initShader(const wchar_t* vsFilename, const wchar_t* ps
 	matrixBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 	matrixBufferDesc.MiscFlags = 0;
 	matrixBufferDesc.StructureByteStride = 0;
-
 	renderer->CreateBuffer(&matrixBufferDesc, NULL, &matrixBuffer);
+
+	D3D11_BUFFER_DESC tessBufferDesc;
+	tessBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	tessBufferDesc.ByteWidth = sizeof(TessFactorBufferType);
+	tessBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	tessBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	tessBufferDesc.MiscFlags = 0;
+	tessBufferDesc.StructureByteStride = 0;
+	renderer->CreateBuffer(&tessBufferDesc, NULL, &tessFactorBuffer);
 
 	
 }
@@ -63,7 +71,7 @@ void TessellationShader::initShader(const wchar_t* vsFilename, const wchar_t* hs
 }
 
 
-void TessellationShader::setShaderParameters(ID3D11DeviceContext* deviceContext, const XMMATRIX &worldMatrix, const XMMATRIX &viewMatrix, const XMMATRIX &projectionMatrix)
+void TessellationShader::setShaderParameters(ID3D11DeviceContext* deviceContext, const XMMATRIX &worldMatrix, const XMMATRIX &viewMatrix, const XMMATRIX &projectionMatrix, float i, float o)
 {
 	HRESULT result;
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
@@ -81,6 +89,14 @@ void TessellationShader::setShaderParameters(ID3D11DeviceContext* deviceContext,
 	dataPtr->projection = tproj;
 	deviceContext->Unmap(matrixBuffer, 0);
 	deviceContext->DSSetConstantBuffers(0, 1, &matrixBuffer);
+
+	TessFactorBufferType* tessPtr;
+	deviceContext->Map(tessFactorBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	tessPtr = (TessFactorBufferType*)mappedResource.pData;
+	tessPtr->inside = i;
+	tessPtr->outside = o;
+	deviceContext->Unmap(tessFactorBuffer, 0);
+	deviceContext->HSSetConstantBuffers(0, 1, &tessFactorBuffer);
 }
 
 

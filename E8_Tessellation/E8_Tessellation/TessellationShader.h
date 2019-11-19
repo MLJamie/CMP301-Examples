@@ -10,13 +10,19 @@ using namespace DirectX;
 
 class TessellationShader : public BaseShader
 {
-
+private:
+	struct TessFactorBufferType
+	{
+		float inside;
+		float outside;
+		float padding[2];
+	};
 public:
 
 	TessellationShader(ID3D11Device* device, HWND hwnd);
 	~TessellationShader();
 
-	void setShaderParameters(ID3D11DeviceContext* deviceContext, const XMMATRIX &world, const XMMATRIX &view, const XMMATRIX &projection);
+	void setShaderParameters(ID3D11DeviceContext* deviceContext, const XMMATRIX &world, const XMMATRIX &view, const XMMATRIX &projection, float inside, float outside);
 
 private:
 	void initShader(const wchar_t* vsFilename, const wchar_t* psFilename);
@@ -24,4 +30,8 @@ private:
 
 private:
 	ID3D11Buffer* matrixBuffer;
+	ID3D11Buffer* tessFactorBuffer;
+
+	float insideT;
+	float outsideT;
 };

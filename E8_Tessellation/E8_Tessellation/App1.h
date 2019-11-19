@@ -21,8 +21,11 @@ protected:
 	void gui();
 
 private:
-	TessellationMesh* mesh;
+	QuadMesh* mesh;
 	TessellationShader* shader;
+
+	float insideTess;
+	float outsideTess;
 };
 
 #endif
