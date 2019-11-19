@@ -13,8 +13,11 @@ void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeigh
 	BaseApplication::init(hinstance, hwnd, screenWidth, screenHeight, in, VSYNC, FULL_SCREEN);
 
 	// Create Mesh object and shader object
-	mesh = new TessellationMesh(renderer->getDevice(), renderer->getDeviceContext());
+	mesh = new QuadMesh(renderer->getDevice(), renderer->getDeviceContext());
 	shader = new TessellationShader(renderer->getDevice(), hwnd);
+
+	insideTess = 4.0f;
+	outsideTess = 4.0f;
 }
 
 
@@ -65,7 +68,7 @@ bool App1::render()
 
 	// Send geometry data, set shader parameters, render object with shader
 	mesh->sendData(renderer->getDeviceContext());
-	shader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix);
+	shader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, insideTess, outsideTess);
 	shader->render(renderer->getDeviceContext(), mesh->getIndexCount());
 
 	// Render GUI
@@ -87,6 +90,10 @@ void App1::gui()
 	// Build UI
 	ImGui::Text("FPS: %.2f", timer->getFPS());
 	ImGui::Checkbox("Wireframe mode", &wireframeToggle);
+	ImGui::SliderFloat("Inside Tess Factor", &insideTess, 1.0f, 64.0f, "%.2f", 1.0f);
+	ImGui::SliderFloat("Outside Tess Factor", &outsideTess, 1.0f, 64.0f, "%.2f", 1.0f);
+
+
 
 	// Render UI
 	ImGui::Render();

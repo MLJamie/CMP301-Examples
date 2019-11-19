@@ -10,8 +10,8 @@ cbuffer MatrixBuffer : register(b0)
 
 struct ConstantOutputType
 {
-    float edges[3] : SV_TessFactor;
-    float inside : SV_InsideTessFactor;
+    float edges[4] : SV_TessFactor;
+    float inside[2] : SV_InsideTessFactor;
 };
 
 struct InputType
@@ -26,8 +26,8 @@ struct OutputType
     float4 colour : COLOR;
 };
 
-[domain("tri")]
-OutputType main(ConstantOutputType input, float3 uvwCoord : SV_DomainLocation, const OutputPatch<InputType, 3> patch)
+[domain("quad")]
+OutputType main(ConstantOutputType input, float2 uvwCoord : SV_DomainLocation, const OutputPatch<InputType, 4> patch)
 {
     float3 vertexPosition;
     OutputType output;
@@ -35,7 +35,9 @@ OutputType main(ConstantOutputType input, float3 uvwCoord : SV_DomainLocation, c
     // Determine the position of the new vertex.
 	// Invert the y and Z components of uvwCoord as these coords are generated in UV space and therefore y is positive downward.
 	// Alternatively you can set the output topology of the hull shader to cw instead of ccw (or vice versa).
-	vertexPosition = uvwCoord.x * patch[0].position + -uvwCoord.y * patch[1].position + -uvwCoord.z * patch[2].position;
+	float3 v1 = lerp(patch[0].position, patch[1].position, uvwCoord.y);
+	float3 v2 = lerp(patch[3].position, patch[2].position, uvwCoord.y);
+	vertexPosition = lerp(v1, v2, uvwCoord.x);
 		    
     // Calculate the position of the new vertex against the world, view, and projection matrices.
     output.position = mul(float4(vertexPosition, 1.0f), worldMatrix);
