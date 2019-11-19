@@ -32,6 +32,50 @@ struct OutputType
 	float3 normal : NORMAL;
 };
 
+float SampleHeightMap(float2 uv)
+{
+	const float scale = 1.0f;
+	return scale * texture0.SampleLevel(sampler0, uv, 0.0f).r;
+}
+
+float3 Sobel(float2 tc)
+{
+	float height;
+	float width;
+	texture0.GetDimensions(width, height);
+	float2 pxSz = float2(1.0f / width, 1.0f / height);
+
+	float2 o00 = tc + float2(-pxSz.x, -pxSz.y);
+	float2 o10 = tc + float2(0.0f, -pxSz.y);
+	float2 o20 = tc + float2(pxSz.x, -pxSz.y);
+
+	float2 o01 = tc + float2(-pxSz.x, 0.0f);
+	float2 o21 = tc + float2(pxSz.x, 0.0f);
+
+	float2 o02 = tc + float2(-pxSz.x, pxSz.y);
+	float2 o12 = tc + float2(0.0f, pxSz.y);
+	float2 o22 = tc + float2(pxSz.x, pxSz.y);
+
+	float h00 = SampleHeightMap(o00);
+	float h10 = SampleHeightMap(o10);
+	float h20 = SampleHeightMap(o20);
+
+	float h01 = SampleHeightMap(o01);
+	float h21 = SampleHeightMap(o21);
+
+	float h02 = SampleHeightMap(o02);
+	float h12 = SampleHeightMap(o12);
+	float h22 = SampleHeightMap(o22);
+
+	float gX = h00 - h20 + 2.0f * h01 - 2.0f * h21 + h02 - h22;
+	float gY = h00 + 2.0f * h10 + h20 - h02 - 2.0f * h12 - h22;
+
+	float gZ = 0.01f * sqrt(max(0.0f, 1.0f - gX * gX - gY * gY));
+
+	return normalize(float3(2.0f * gX, gZ, 2.0f * gY));
+}
+
+
 OutputType main(InputType input)
 {
 	OutputType output;
@@ -42,6 +86,10 @@ OutputType main(InputType input)
 	input.position.y = colors * 50;
 
 	input.position.w = 1.0f;
+
+
+	
+
 
 	//normals
 	//float3 pointNorth, pointEast, pointSouth, pointWest, vectorNorth, vectorEast, vectorSouth, vectorWest, normalSW, normalSE, normalNE, normalNW, finalNormal;
@@ -82,7 +130,9 @@ OutputType main(InputType input)
 	//input.normal.x = finalNormal.x;
 	//input.normal.y = finalNormal.y;
 	//input.normal.z = finalNormal.z;
+	float3 normal = Sobel(input.tex);
 
+	input.normal = normal;
 	// Calculate the position of the vertex against the world, view, and projection matrices.
 	output.position = mul(input.position, worldMatrix);
 	output.position = mul(output.position, viewMatrix);
