@@ -16,11 +16,15 @@ void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeigh
 	textureMgr->loadTexture(L"brick", L"res/brick1.dds");
 
 	// Create Mesh object and shader object
-	mesh = new SphereMesh(renderer->getDevice(), renderer->getDeviceContext());
+	mesh = new PlaneMesh(renderer->getDevice(), renderer->getDeviceContext());
 	shader = new LightShader(renderer->getDevice(), hwnd);
 	light = new Light;
 	light->setDiffuseColour(1.0f, 1.0f, 1.0f, 1.0f);
+	light->setAmbientColour(0.0f, 0.0f, 0.0f, 1.0f);
 	light->setDirection(1.0f, 0.0f, 0.0f);
+	
+	lightX = 50.0f;
+	lightZ = 50.0f;
 
 }
 
@@ -80,6 +84,7 @@ bool App1::render()
 	viewMatrix = camera->getViewMatrix();
 	projectionMatrix = renderer->getProjectionMatrix();
 
+	light->setPosition(lightX, 10.0f, lightZ);
 	// Send geometry data, set shader parameters, render object with shader
 	mesh->sendData(renderer->getDeviceContext());
 	shader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"brick"), light);
@@ -104,7 +109,8 @@ void App1::gui()
 	// Build UI
 	ImGui::Text("FPS: %.2f", timer->getFPS());
 	ImGui::Checkbox("Wireframe mode", &wireframeToggle);
-
+	ImGui::SliderFloat("Light X Pos", &lightX, 0.0f, 100.0f, "%.3f", 1.0f);
+	ImGui::SliderFloat("Light Z Pos", &lightZ, 0.0f, 100.0f, "%.3f", 1.0f);
 	// Render UI
 	ImGui::Render();
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
