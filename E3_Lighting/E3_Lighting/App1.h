@@ -23,8 +23,11 @@ protected:
 
 private:
 	LightShader* shader;
-	SphereMesh* mesh;
+	PlaneMesh* mesh;
 	Light* light;
+
+	float lightX;
+	float lightZ;
 };
 
 #endif

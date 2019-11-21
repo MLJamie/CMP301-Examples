@@ -91,45 +91,7 @@ OutputType main(InputType input)
 	
 
 
-	//normals
-	//float3 pointNorth, pointEast, pointSouth, pointWest, vectorNorth, vectorEast, vectorSouth, vectorWest, normalSW, normalSE, normalNE, normalNW, finalNormal;
-
-
-	////fix the normals
-
-	//pointNorth.x = input.position.x;
-	//pointNorth.z = input.position.z + 1;
-	//pointNorth.y = texture0.SampleLevel(sampler0, float2(input.tex.x, input.tex.y - 1), 0.0f);
-
-	//pointEast.x = input.position.x + 1;
-	//pointEast.z = input.position.z;
-	//pointEast.y = texture0.SampleLevel(sampler0, float2(input.tex.x + 1, input.tex.y), 0.0f);
-
-	//pointSouth.x = input.position.x;
-	//pointSouth.z = input.position.z - 1;
-	//pointSouth.y = texture0.SampleLevel(sampler0, float2(input.tex.x, input.tex.y + 1), 0.0f);
-
-	//pointWest.x = input.position.x - 1;
-	//pointWest.z = input.position.z;
-	//pointWest.y = texture0.SampleLevel(sampler0, float2(input.tex.x - 1, input.tex.y), 0.0f);
-
-	//vectorNorth = normalize(pointNorth - input.position);
-	//vectorEast = normalize(pointEast - input.position);
-	//vectorSouth = normalize(pointSouth - input.position);
-	//vectorWest = normalize(pointWest - input.position);
-
-
-	//normalNE = cross(vectorNorth, vectorEast);
-	//normalNW = cross(vectorNorth, vectorWest);
-	//normalSW = cross(vectorSouth, vectorWest);
-	//normalSE = cross(vectorEast, vectorSouth);
-
-
-	//finalNormal = (normalSW + normalSE + normalNW + normalNE) / 4;
-
-	//input.normal.x = finalNormal.x;
-	//input.normal.y = finalNormal.y;
-	//input.normal.z = finalNormal.z;
+	//generate normals using the sobel filter
 	float3 normal = Sobel(input.tex);
 
 	input.normal = normal;

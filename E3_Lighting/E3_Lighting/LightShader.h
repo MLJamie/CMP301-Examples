@@ -11,7 +11,8 @@ private:
 	struct LightBufferType
 	{
 		XMFLOAT4 diffuse;
-		XMFLOAT3 direction;
+		XMFLOAT4 ambient;
+		XMFLOAT3 position;
 		float padding;
 	};
 
