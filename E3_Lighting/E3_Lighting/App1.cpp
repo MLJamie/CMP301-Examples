@@ -21,9 +21,8 @@ void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeigh
 	light = new Light;
 	light->setDiffuseColour(1.0f, 1.0f, 1.0f, 1.0f);
 	light->setAmbientColour(0.0f, 0.0f, 0.0f, 1.0f);
-	light->setDirection(1.0f, 0.0f, 0.0f);
 	light->setSpecularColour(1.0f, 1.0f, 1.0f, 1.0f);
-	light->setSpecularPower(50.0f);
+	light->setSpecularPower(100.0f);
 	
 	lightX = 50.0f;
 	lightZ = 50.0f;
