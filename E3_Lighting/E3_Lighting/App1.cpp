@@ -22,6 +22,8 @@ void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeigh
 	light->setDiffuseColour(1.0f, 1.0f, 1.0f, 1.0f);
 	light->setAmbientColour(0.0f, 0.0f, 0.0f, 1.0f);
 	light->setDirection(1.0f, 0.0f, 0.0f);
+	light->setSpecularColour(1.0f, 1.0f, 1.0f, 1.0f);
+	light->setSpecularPower(50.0f);
 	
 	lightX = 50.0f;
 	lightZ = 50.0f;
@@ -87,7 +89,7 @@ bool App1::render()
 	light->setPosition(lightX, 10.0f, lightZ);
 	// Send geometry data, set shader parameters, render object with shader
 	mesh->sendData(renderer->getDeviceContext());
-	shader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"brick"), light);
+	shader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"brick"), light, camera);
 	shader->render(renderer->getDeviceContext(), mesh->getIndexCount());
 
 	// Render GUI
