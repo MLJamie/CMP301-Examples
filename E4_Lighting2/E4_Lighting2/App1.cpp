@@ -17,10 +17,18 @@ void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeigh
 	mesh = new PlaneMesh(renderer->getDevice(), renderer->getDeviceContext());
 	textureMgr->loadTexture(L"brick", L"res/brick1.dds");
 	shader = new LightShader(renderer->getDevice(), hwnd);
-	light = new Light;
-	light->setAmbientColour(0.0f, 0.0f, 0.0f, 1.0f);
-	light->setDiffuseColour(1.0f, 1.0f, 1.0f, 1.0f);
-	light->setPosition(50.0f, 10.0f, 50.0f);
+	light[0] = new Light;
+	light[1] = new Light;
+	light[0]->setAmbientColour(0.0f, 0.0f, 0.0f, 1.0f);
+	light[0]->setDiffuseColour(1.0f, 0.0f, 0.0f, 1.0f);
+	light[0]->setPosition(55.0f, 10.0f, 55.0f);
+	light[1]->setAmbientColour(0.0f, 0.0f, 0.0f, 1.0f);
+	light[1]->setDiffuseColour(0.0f, 0.0f, 1.0f, 1.0f);
+	light[1]->setPosition(40.0f, 10.0f, 40.0f);
+	attenuation.x = 1.0f;
+	attenuation.y = 0.125f;
+	attenuation.z = 0.0f;
+	
 
 }
 
@@ -82,7 +90,7 @@ bool App1::render()
 
 	// Send geometry data, set shader parameters, render object with shader
 	mesh->sendData(renderer->getDeviceContext());
-	shader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"brick"), light);
+	shader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"brick"), light, attenuation);
 	shader->render(renderer->getDeviceContext(), mesh->getIndexCount());
 
 	// Render GUI
@@ -105,6 +113,9 @@ void App1::gui()
 	ImGui::Text("FPS: %.2f", timer->getFPS());
 	ImGui::Checkbox("Wireframe mode", &wireframeToggle);
 	ImGui::Text("Press E to raise camera \nto see the plane being rendered");
+	ImGui::SliderFloat3("Test", (float*)&attenuation, 0.0f, 2.0f, "%.3f", 1.0f);
+
+
 
 	// Render UI
 	ImGui::Render();

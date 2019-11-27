@@ -86,7 +86,7 @@ void LightShader::initShader(const wchar_t* vsFilename, const wchar_t* psFilenam
 }
 
 
-void LightShader::setShaderParameters(ID3D11DeviceContext* deviceContext, const XMMATRIX &worldMatrix, const XMMATRIX &viewMatrix, const XMMATRIX &projectionMatrix, ID3D11ShaderResourceView* texture, Light* light)
+void LightShader::setShaderParameters(ID3D11DeviceContext* deviceContext, const XMMATRIX &worldMatrix, const XMMATRIX &viewMatrix, const XMMATRIX &projectionMatrix, ID3D11ShaderResourceView* texture, Light* light[2], XMFLOAT3 attenuation)
 {
 	HRESULT result;
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
@@ -112,9 +112,15 @@ void LightShader::setShaderParameters(ID3D11DeviceContext* deviceContext, const 
 	LightBufferType* lightPtr;
 	deviceContext->Map(lightBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	lightPtr = (LightBufferType*)mappedResource.pData;
-	lightPtr->ambient = light->getAmbientColour();
-	lightPtr->diffuse = light->getDiffuseColour();
-	lightPtr->position = light->getPosition();
+	for (int i = 0; i < 2; ++i)
+	{
+		lightPtr->ambient[i] = light[i]->getAmbientColour();
+		lightPtr->diffuse[i] = light[i]->getDiffuseColour();
+		lightPtr->position[i] = XMFLOAT4(light[i]->getPosition().x, light[i]->getPosition().y, light[i]->getPosition().z, 1.0f);
+	}	
+	lightPtr->constantAtten = attenuation.x;
+	lightPtr->linearAtten = attenuation.y;
+	lightPtr->quadraticAtten = attenuation.z;
 	lightPtr->padding = 0.0f;
 	deviceContext->Unmap(lightBuffer, 0);
 	deviceContext->PSSetConstantBuffers(0, 1, &lightBuffer);

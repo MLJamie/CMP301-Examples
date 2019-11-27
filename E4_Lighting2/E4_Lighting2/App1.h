@@ -24,7 +24,10 @@ protected:
 private:
 	LightShader* shader;
 	PlaneMesh* mesh;
-	Light* light;
+	Light* light[2];
+	
+
+	XMFLOAT3 attenuation;
 };
 
 #endif
