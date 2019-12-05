@@ -28,11 +28,14 @@ private:
 	TextureShader* textureShader;
 	PlaneMesh* mesh;
 
-	Light* light;
+	SphereMesh* sphere;
+
+	Light* light[2];
 	Model* model;
 	ShadowShader* shadowShader;
 	DepthShader* depthShader;
 
+	float angle;
 	ShadowMap* shadowMap;
 };
 

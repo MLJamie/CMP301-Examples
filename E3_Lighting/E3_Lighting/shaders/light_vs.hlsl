@@ -47,8 +47,8 @@ OutputType main(InputType input)
 
 	output.worldPosition = mul(input.position, worldMatrix).xyz;
 
-	output.viewVector = cameraPosition.xyz - output.worldPosition.xyz;
-	output.viewVector = normalize(output.viewVector);
+	output.viewVector = normalize(cameraPosition.xyz - output.worldPosition.xyz);
+	//output.viewVector = normalize(output.viewVector);
 
 	return output;
 }

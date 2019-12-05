@@ -43,11 +43,11 @@ float4 main(InputType input) : SV_TARGET
 
 		float3 lightVector = normalize(position[i] - input.worldPosition);
 
-		lightColours[i] = ambient[i] + calculateLighting(lightVector, input.normal, (diffuse[i] * attenuation));
+		lightColours[i] = (ambient[i] + calculateLighting(lightVector, input.normal, (diffuse[i] * attenuation))) * textureColour;
 
 	}
 	float4 lightColour = lightColours[0] + lightColours[1];
-	return lightColour * textureColour;
+	return lightColour;
 }
 
 
