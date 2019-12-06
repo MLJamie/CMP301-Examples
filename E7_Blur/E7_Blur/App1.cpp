@@ -19,10 +19,14 @@ void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeigh
 	textureShader = new TextureShader(renderer->getDevice(), hwnd);
 	horizontalBlurShader = new HorizontalBlurShader(renderer->getDevice(), hwnd);
 	verticalBlurShader = new VerticalBlurShader(renderer->getDevice(), hwnd);
+	kuwaharaShader = new KuwaharaShader(renderer->getDevice(), hwnd);
 
 	renderTexture = new RenderTexture(renderer->getDevice(), screenWidth, screenHeight, SCREEN_NEAR, SCREEN_DEPTH);
 	horizontalBlurTexture = new RenderTexture(renderer->getDevice(), screenWidth, screenHeight, SCREEN_NEAR, SCREEN_DEPTH);
 	verticalBlurTexture = new RenderTexture(renderer->getDevice(), screenWidth, screenHeight, SCREEN_NEAR, SCREEN_DEPTH);
+	downSampleTexture = new RenderTexture(renderer->getDevice(), screenWidth / 2, screenHeight / 2, SCREEN_NEAR, SCREEN_DEPTH);
+	kuwaharaTexture = new RenderTexture(renderer->getDevice(), screenWidth, screenHeight, SCREEN_NEAR, SCREEN_DEPTH);
+
 
 	light = new Light;
 	light->setAmbientColour(0.0f, 0.0f, 0.0f, 1.0f);
@@ -66,10 +70,11 @@ bool App1::render()
 	// Render scene
 	firstPass();
 	// Apply horizontal blur stage
-	horizontalBlur();
+	//horizontalBlur();
 	// Apply vertical blur to the horizontal blur stage
-	verticalBlur();
+	//verticalBlur();
 	// Render final pass to frame buffer
+	kuwaharaPass();
 	finalPass();
 
 	return true;
@@ -83,14 +88,21 @@ void App1::firstPass()
 
 	// Get matrices
 	camera->update();
+
+
 	XMMATRIX worldMatrix = renderer->getWorldMatrix();
 	XMMATRIX viewMatrix = camera->getViewMatrix();
 	XMMATRIX projectionMatrix = renderer->getProjectionMatrix();
+	XMMATRIX orthoMatrix = renderer->getOrthoMatrix();  // ortho matrix for 2D rendering
+	XMMATRIX orthoViewMatrix = camera->getOrthoViewMatrix();	// Default camera position for orthographic rendering
+
 
 	// Render shape with simple lighting shader set.
+	
 	cubeMesh->sendData(renderer->getDeviceContext());
 	lightShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"brick"), light);
 	lightShader->render(renderer->getDeviceContext(), cubeMesh->getIndexCount());
+	
 
 	// Reset the render target back to the original back buffer and not the render to texture anymore.
 	renderer->setBackBufferRenderTarget();
@@ -117,6 +129,31 @@ void App1::horizontalBlur()
 
 	// Reset the render target back to the original back buffer and not the render to texture anymore.
 	renderer->setBackBufferRenderTarget();
+}
+
+void App1::kuwaharaPass()
+{
+	XMMATRIX worldMatrix, baseViewMatrix, orthoMatrix;
+
+	float screenSizeX = (float)kuwaharaTexture->getTextureWidth();
+	float screenSizeY = (float)kuwaharaTexture->getTextureHeight();
+	kuwaharaTexture->setRenderTarget(renderer->getDeviceContext());
+	kuwaharaTexture->clearRenderTarget(renderer->getDeviceContext(), 1.0f, 1.0f, 0.0f, 1.0f);
+
+	worldMatrix = renderer->getWorldMatrix();
+	baseViewMatrix = camera->getOrthoViewMatrix();
+	orthoMatrix = kuwaharaTexture->getOrthoMatrix();
+
+	// Render for Horizontal Blur
+	renderer->setZBuffer(false);
+	orthoMesh->sendData(renderer->getDeviceContext());
+	kuwaharaShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, baseViewMatrix, orthoMatrix, renderTexture->getShaderResourceView(), screenSizeX, screenSizeY);
+	kuwaharaShader->render(renderer->getDeviceContext(), orthoMesh->getIndexCount());
+	renderer->setZBuffer(true);
+
+	// Reset the render target back to the original back buffer and not the render to texture anymore.
+	renderer->setBackBufferRenderTarget();
+
 }
 
 void App1::verticalBlur()
@@ -146,19 +183,42 @@ void App1::verticalBlur()
 void App1::finalPass()
 {
 	// Clear the scene. (default blue colour)
+ //   renderTexture->setRenderTarget(renderer->getDeviceContext());
+	//renderTexture->clearRenderTarget(renderer->getDeviceContext(), 0.0f, 1.0f, 1.0f, 1.0f);
+
+
+
 	renderer->beginScene(0.39f, 0.58f, 0.92f, 1.0f);
 
 	// RENDER THE RENDER TEXTURE SCENE
 	// Requires 2D rendering and an ortho mesh.
-	renderer->setZBuffer(false);
 	XMMATRIX worldMatrix = renderer->getWorldMatrix();
 	XMMATRIX orthoMatrix = renderer->getOrthoMatrix();  // ortho matrix for 2D rendering
 	XMMATRIX orthoViewMatrix = camera->getOrthoViewMatrix();	// Default camera position for orthographic rendering
 
+	renderer->setZBuffer(false);
+
 	orthoMesh->sendData(renderer->getDeviceContext());
-	textureShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, orthoViewMatrix, orthoMatrix, verticalBlurTexture->getShaderResourceView());
+	textureShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, orthoViewMatrix, orthoMatrix, kuwaharaTexture->getShaderResourceView());
 	textureShader->render(renderer->getDeviceContext(), orthoMesh->getIndexCount());
 	renderer->setZBuffer(true);
+
+
+	//renderer->setBackBufferRenderTarget();
+
+	//worldMatrix = renderer->getWorldMatrix();
+	//orthoMatrix = renderer->getOrthoMatrix();  // ortho matrix for 2D rendering
+	//orthoViewMatrix = camera->getOrthoViewMatrix();	// Default camera position for orthographic rendering
+
+	//renderer->setZBuffer(false);
+
+	//orthoMesh->sendData(renderer->getDeviceContext());
+	//textureShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, orthoViewMatrix, orthoMatrix, renderTexture->getShaderResourceView());
+	//textureShader->render(renderer->getDeviceContext(), orthoMesh->getIndexCount());
+	//renderer->setZBuffer(true);
+
+
+
 
 	// Render GUI
 	gui();

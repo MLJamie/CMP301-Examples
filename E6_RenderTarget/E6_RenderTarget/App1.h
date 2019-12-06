@@ -28,6 +28,7 @@ private:
 	OrthoMesh* orthoMesh;
 	LightShader* lightShader;
 	TextureShader* textureShader;
+	FPCamera* cam2;
 
 	RenderTexture* renderTexture;
 

@@ -8,6 +8,7 @@
 #include "TextureShader.h"
 #include "VerticalBlurShader.h"
 #include "HorizontalBlurShader.h"
+#include "KuwaharaShader.h"
 
 class App1 : public BaseApplication
 {
@@ -24,20 +25,25 @@ protected:
 	void firstPass();
 	void verticalBlur();
 	void horizontalBlur();
+	void kuwaharaPass();
 	void finalPass();
 	void gui();
 
 private:
 	CubeMesh* cubeMesh;
 	OrthoMesh* orthoMesh;
+	OrthoMesh* halfOrthoMesh;
 	LightShader* lightShader;
 	TextureShader* textureShader;
 
 	RenderTexture* renderTexture;
 	RenderTexture* horizontalBlurTexture;
 	RenderTexture* verticalBlurTexture;
+	RenderTexture* downSampleTexture;
+	RenderTexture* kuwaharaTexture;
 	VerticalBlurShader* verticalBlurShader;
 	HorizontalBlurShader* horizontalBlurShader;
+	KuwaharaShader* kuwaharaShader;
 	
 	Light* light;
 };

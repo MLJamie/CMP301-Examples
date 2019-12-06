@@ -1,6 +1,7 @@
 
 Texture2D shaderTexture : register(t0);
 Texture2D depthMapTexture : register(t1);
+Texture2D depthMapTexture2 : register(t2);
 
 SamplerState diffuseSampler  : register(s0);
 SamplerState shadowSampler : register(s1);
@@ -33,7 +34,7 @@ float4 main(InputType input) : SV_TARGET
     float depthValue;
     float lightDepthValue;
     float shadowMapBias = 0.005f;
-	float4 colours[2];
+	float4 colours = float4(0.0f, 0.0f, 0.0f, 1.0f);
     float4 textureColour = shaderTexture.Sample(diffuseSampler, input.tex);
 
 
@@ -50,7 +51,14 @@ float4 main(InputType input) : SV_TARGET
 		}
 
 		// Sample the shadow map (get depth of geometry)
-		depthValue = depthMapTexture.Sample(shadowSampler, pTexCoord).r;
+		if (i == 0)
+		{
+			depthValue = depthMapTexture.Sample(shadowSampler, pTexCoord).r;
+		}
+		else
+		{
+			depthValue = depthMapTexture2.Sample(shadowSampler, pTexCoord).r;
+		}
 		// Calculate the depth from the light.
 		lightDepthValue = input.lightViewPos[i].z / input.lightViewPos[i].w;
 		lightDepthValue -= shadowMapBias;
@@ -58,11 +66,11 @@ float4 main(InputType input) : SV_TARGET
 		// Compare the depth of the shadow map value and the depth of the light to determine whether to shadow or to light this pixel.
 		if (lightDepthValue < depthValue)
 		{
-			colours[i] = ambient[i] + calculateLighting(-direction[i], input.normal, diffuse[i]);
+			colours += ambient[i] + calculateLighting(-direction[i], input.normal, diffuse[i]);
 		}
 
 	}
-	float4 colour = colours[0] + colours[1];
+	//float4 colour = colours;
     //colour = saturate(colour + ambient[1]);
-    return saturate(colour) * textureColour;
+    return saturate(colours) * textureColour;
 }

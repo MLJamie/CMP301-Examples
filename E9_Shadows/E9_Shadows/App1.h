@@ -20,7 +20,7 @@ public:
 
 protected:
 	bool render();
-	void depthPass();
+	void depthPass(ShadowMap* sm, int id);
 	void finalPass();
 	void gui();
 
@@ -36,7 +36,7 @@ private:
 	DepthShader* depthShader;
 
 	float angle;
-	ShadowMap* shadowMap;
+	ShadowMap* shadowMap[2];
 };
 
 #endif

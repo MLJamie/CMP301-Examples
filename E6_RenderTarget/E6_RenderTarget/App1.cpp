@@ -27,6 +27,9 @@ void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeigh
 	light->setAmbientColour(0.0f, 0.0f, 0.0f, 1.0f);
 	light->setDiffuseColour(1.0f, 1.0f, 1.0f, 1.0f);
 	light->setDirection(0.7f, 0.0f, 0.7f);
+
+	cam2 = new FPCamera(input, sWidth, sHeight, wnd);
+	cam2->setPosition(3.0f, 0.0f, -10.0f);
 }
 
 
@@ -75,12 +78,12 @@ void App1::firstPass()
 {
 	// Set the render target to be the render to texture and clear it
 	renderTexture->setRenderTarget(renderer->getDeviceContext());
-	renderTexture->clearRenderTarget(renderer->getDeviceContext(), 0.0f, 0.0f, 1.0f, 1.0f);
+	renderTexture->clearRenderTarget(renderer->getDeviceContext(), 1.0f, 0.0f, 0.0f, 1.0f);
 
 	// Get matrices
-	camera->update();
+	cam2->update();
 	XMMATRIX worldMatrix = renderer->getWorldMatrix();
-	XMMATRIX viewMatrix = camera->getViewMatrix();
+	XMMATRIX viewMatrix = cam2->getViewMatrix();
 	XMMATRIX projectionMatrix = renderer->getProjectionMatrix();
 
 	// Render shape with simple lighting shader set.
@@ -113,7 +116,7 @@ void App1::finalPass()
 	// Requires 2D rendering and an ortho mesh.
 	renderer->setZBuffer(false);
 	XMMATRIX orthoMatrix = renderer->getOrthoMatrix();  // ortho matrix for 2D rendering
-	XMMATRIX orthoViewMatrix = camera->getOrthoViewMatrix();	// Default camera position for orthographic rendering
+	XMMATRIX orthoViewMatrix = cam2->getOrthoViewMatrix();	// Default camera position for orthographic rendering
 
 	orthoMesh->sendData(renderer->getDeviceContext());
 	textureShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, orthoViewMatrix, orthoMatrix, renderTexture->getShaderResourceView());
